@@ -604,11 +604,6 @@ if "step6_selections" not in st.session_state:
 if "step6_page" not in st.session_state:
     st.session_state.step6_page = 0
 
-if "step7_page" not in st.session_state:
-    st.session_state.step7_page = 0
-if "step7_results" not in st.session_state:
-    st.session_state.step7_results = {}
-
 def go_to_prev_step6_page():
     if st.session_state.step6_page > 0:
         st.session_state.step6_page -= 1
@@ -701,55 +696,100 @@ if st.session_state.step == 6:
             else:
                 st.button("다음항목 선택하기", on_click=go_to_next_step6_page)
 
-# ===== Step 7 Logic =====
+# ===== Step 7 =====
 if st.session_state.step == 7:
+    if "step7_page" not in st.session_state:
+        st.session_state.step7_page = 0
+    if "step7_results" not in st.session_state:
+        st.session_state.step7_results = {}
+
     targets = st.session_state.step6_targets
     total_pages = len(targets)
-    current_key = targets[st.session_state.step7_page]
-    step6_selections = st.session_state.step6_selections
+    if not targets:
+        st.warning("Step5에서 선택된 항목이 없습니다.")
+    else:
+        current_key = targets[st.session_state.step7_page]
+        step6_selections = st.session_state.step6_selections
 
-    st.markdown("## 제조방법 변경에 따른 필요서류 및 보고유형")
-    st.markdown(step6_items[current_key]["title"])
+        st.markdown("## 제조방법 변경에 따른 필요서류 및 보고유형")
+        st.markdown(step6_items[current_key]["title"])
 
-    hit = False
+        hit = False
 
-    if current_key == "s1_1":
-        if step6_selections.get("s1_1_req_1") == "충족":
-            text1 = """보고유형은 다음과 같습니다.
+        if current_key == "s1_1":
+            if step6_selections.get("s1_1_req_1") == "충족":
+                hit = True
+                output_1_text = (
+                    "보고유형은 다음과 같습니다.\n\n"
+                    "AR, 연차보고\n"
+                    "「의약품의 품목허가‧신고‧심사 규정」 제3조의2 제2항 및 제4항에 따른 연차보고(Annual Report, AR) 수준의 변경사항입니다."
+                )
+                output_2_text = (
+                    "필요서류는 다음과 같습니다.\n\n"
+                    "1. (S.1.1) 공정서 또는 국제 의약품 일반명 리스트(INN, The International Nonproprietary Name) 등 근거서류.\n"
+                    "2. 개정된 제품정보"
+                )
+                st.markdown(output_1_text)
+                st.markdown(output_2_text)
+                st.session_state.step7_results.setdefault(current_key, []).append(
+                    ("AR", output_1_text, output_2_text)
+                )
 
-AR, 연차보고
-「의약품의 품목허가‧신고‧심사 규정」 제3조의2 제2항 및 제4항에 따른 연차보고(Annual Report, AR) 수준의 변경사항입니다."""
-            text2 = """필요서류는 다음과 같습니다.
+        elif current_key == "s2_2":
+            if (
+                step6_selections.get("s2_2_sub_2a") == "변경 있음" and
+                step6_selections.get("s2_2_req_3") == "충족" and
+                step6_selections.get("s2_2_req_4") == "충족" and
+                step6_selections.get("s2_2_req_9") == "충족" and
+                step6_selections.get("s2_2_req_1") == "미충족" and
+                step6_selections.get("s2_2_req_2") == "미충족" and
+                step6_selections.get("s2_2_req_5") == "미충족" and
+                step6_selections.get("s2_2_req_6") == "미충족" and
+                step6_selections.get("s2_2_req_7") == "미충족" and
+                step6_selections.get("s2_2_req_8") == "미충족" and
+                step6_selections.get("s2_2_req_10") == "미충족"
+            ):
+                hit = True
+                output_1_text = (
+                    "보고유형은 다음과 같습니다.\n\n"
+                    "IR, 시판전보고\n"
+                    "「의약품의 품목허가‧신고‧심사 규정」 제3조의2제4항 단서조항에 따른 시판전 보고(Immediate Report, IR) 수준의 변경사항입니다."
+                )
+                output_2_text = (
+                    "필요서류는 다음과 같습니다.\n\n"
+                    "1. (해당되는 경우) 해당 품목을 제조하는 제조소에 ‘의약품 등의 안전에 관한 규칙’ 제48조의2에 따른 제조 및 품질관리기준 적합판정서, 해외 제조원인 경우 제4조제1항제4호에 따른 유효기간 내의 제조증명서.\n"
+                    "2. (S.2.1) 제조소명, 주소, 책임부과범위 및 해당하는 경우 수탁업소에 관한 자료.\n"
+                    "4. 변경 전·후 제조소의 원료의약품, 중간체 또는 원료의약품 출발 물질 (해당되는 경우)제조 공정에 관한 자료.\n"
+                    "10. 변경 전·후 출발 물질 또는 중간체의 최소 1배치에 대한 시험 성적서(해당하는 경우), 출발물질 또는 중간체 변경 전·후 최종 원료의약품 2배치에 대한 배치분석 자료."
+                )
+                st.markdown(output_1_text)
+                st.markdown(output_2_text)
+                st.session_state.step7_results.setdefault(current_key, []).append(
+                    ("IR", output_1_text, output_2_text)
+                )
 
-1. (S.1.1) 공정서 또는 국제 의약품 일반명 리스트(INN, The International Nonproprietary Name) 등 근거서류.
-2. 개정된 제품정보"""
-            st.markdown(text1)
-            st.markdown(text2)
-            st.session_state.step7_results.setdefault(current_key, []).append(("필요서류", text1, text2))
-            hit = True
-
-    if not hit:
-        st.warning(
-            "해당 변경사항에 대한 충족조건을 고려하였을 때,\n"
-            "「의약품 허가 후 제조방법 변경관리 가이드라인」에서 제시하고 있는\n"
-            "범위에 해당하지 않는 것으로 확인됩니다"
-        )
-
-    col1, col2 = st.columns(2)
-    with col1:
-        st.button(
-            "이전단계로",
-            disabled=st.session_state.step7_page == 0,
-            on_click=lambda: st.session_state.__setitem__('step7_page', st.session_state.step7_page - 1)
-        )
-    with col2:
-        if st.session_state.step7_page == total_pages - 1:
-            st.button(
-                "신청양식 확인하기",
-                on_click=lambda: st.session_state.__setitem__('step', 8)
+        if not hit:
+            st.warning(
+                "해당 변경사항에 대한 충족조건을 고려하였을 때,\n"
+                "「의약품 허가 후 제조방법 변경관리 가이드라인」에서 제시하고 있는\n"
+                "범위에 해당하지 않는 것으로 확인됩니다"
             )
-        else:
+
+        col1, col2 = st.columns(2)
+        with col1:
             st.button(
-                "다음단계로",
-                on_click=lambda: st.session_state.__setitem__('step7_page', st.session_state.step7_page + 1)
+                "이전단계로",
+                disabled=st.session_state.step7_page == 0,
+                on_click=lambda: st.session_state.__setitem__('step7_page', st.session_state.step7_page - 1)
             )
+        with col2:
+            if st.session_state.step7_page == total_pages - 1:
+                st.button(
+                    "신청양식 확인하기",
+                    on_click=lambda: st.session_state.__setitem__('step', 8)
+                )
+            else:
+                st.button(
+                    "다음단계로",
+                    on_click=lambda: st.session_state.__setitem__('step7_page', st.session_state.step7_page + 1)
+                )
